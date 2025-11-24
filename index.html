@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pacote de Conteúdo Exclusivo - xprincesswhore</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner">
+      <div class="spinner-ring"></div>
+      <p>Carregando conteúdo...</p>
+    </div>
+  </div>
+
+  <header>
+    <div class="header-banner">
+      <div class="header-content">
+        <h1>Conteúdo Exclusivo <span class="brand-name">xprincesswhore</span></h1>
+        <p>Acompanhe meu universo com vlogs, estética gótica e autenticidade.</p>
+        <div class="header-badge">
+          <i class="fas fa-star"></i>
+          <span>Conteúdo 100% original</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="grid-container">
+      <div class="grid">
+        <div class="carousel-section">
+          <div class="section-header">
+            <h2>Prévia do Conteúdo</h2>
+            <div class="slide-counter">
+              <span id="currentSlide">1</span> / <span id="totalSlides">4</span>
+            </div>
+          </div>
+          
+          <div class="carousel" id="carouselRoot" aria-roledescription="carousel">
+            <div class="slides" id="slides"></div>
+
+            <div class="controls" aria-hidden="true">
+              <button class="ctrl-btn" id="prev" title="Anterior" aria-label="Anterior">
+                <i class="fa-solid fa-chevron-left"></i>
+              </button>
+              <button class="ctrl-btn" id="next" title="Próximo" aria-label="Próximo">
+                <i class="fa-solid fa-chevron-right"></i>
+              </button>
+            </div>
+
+            <div class="indicators" id="indicators" role="tablist" aria-label="Slides"></div>
+          </div>
+          
+          <div class="carousel-footer">
+            <div class="media-info">
+              <span class="media-type-tag" id="mediaTypeTag">Vídeo</span>
+              <span class="muted">Duração total aprox. 10–15 min</span>
+            </div>
+            <div class="delivery-info">
+              <i class="fas fa-bolt"></i>
+              <span class="muted">Entrega Imediata</span>
+            </div>
+          </div>
+        </div>
+
+        <aside>
+          <div class="desc">
+            <h3 id="section-title">O que inclui neste pacote?</h3>
+            <p>Um pacote curado com clipes e fotos do dia a dia: vlogs, performances, playlists e cenas estéticas. Ideal para quem aprecia a estética emo/gótica e a minha autenticidade.</p>
+            <div class="features">
+              <div class="feature">
+                <div class="feature-icon">
+                  <i class="fa-solid fa-play"></i>
+                </div>
+                <div class="feature-content">
+                  <strong>Clipes e Fotos Exclusivas</strong>
+                  <span class="muted">Conteúdo inédito em alta qualidade.</span>
+                </div>
+              </div>
+              <div class="feature">
+                <div class="feature-icon">
+                  <i class="fa-solid fa-shield-halved"></i>
+                </div>
+                <div class="feature-content">
+                  <strong>Conteúdo Seguro e Verificado</strong>
+                  <span class="muted">Sem nudez ou conteúdo adulto.</span>
+                </div>
+              </div>
+              <div class="feature">
+                <div class="feature-icon">
+                  <i class="fa-solid fa-download"></i>
+                </div>
+                <div class="feature-content">
+                  <strong>Download Liberado</strong>
+                  <span class="muted">Arquivos para você guardar e assistir offline.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="purchase" aria-labelledby="purchase-title">
+            <div class="pricing">
+              <h3 id="purchase-title">Finalize a compra</h3>
+              <div class="price">
+                <span class="original-price">R$ 49,90</span>
+                <span class="current-price">R$ 20,00</span>
+                <span class="discount-badge">60% OFF</span>
+              </div>
+              <div class="muted">Pagamento único — acesso vitalício ao pacote.</div>
+            </div>
+
+            <div class="cta">
+              <button class="btn-buy" id="buyBtn" aria-haspopup="dialog" title="Comprar Pacote">
+                <i class="fa-solid fa-wallet"></i>
+                <span>Comprar por R$ 20</span>
+              </button>
+              <button class="alt" id="previewBtn" title="Visualizar prévia aleatória">
+                <i class="fa-solid fa-eye"></i>
+                <span>Prévia Aleatória</span>
+              </button>
+            </div>
+
+            <div class="payment-info">
+              <div class="payment-methods">
+                <i class="fab fa-cc-visa"></i>
+                <i class="fab fa-cc-mastercard"></i>
+                <i class="fab fa-pix"></i>
+              </div>
+              <p><strong>Formas de pagamento:</strong> cartão, PIX ou link de pagamento. Após a confirmação, você receberá um link privado para download/stream.</p>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-content">
+      <p>© 2025 xprincesswhore • Todos os direitos reservados.</p>
+      <div class="security-badge">
+        <i class="fas fa-lock"></i>
+        <span>Compra processada com segurança InvictusPay</span>
+      </div>
+    </div>
+  </footer>
+
+  <div class="modal-back" id="modalBack" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal" role="document">
+      <div class="modal-header">
+        <h4>Confirmar Compra</h4>
+        <button class="close-btn" id="closeModal" aria-label="Fechar">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="purchase-summary">
+          <i class="fas fa-shopping-bag"></i>
+          <div>
+            <strong>Pacote de conteúdo exclusivo</strong>
+            <span>R$ 20,00</span>
+          </div>
+        </div>
+        <p>Deseja prosseguir para a página de pagamento?</p>
+      </div>
+      <div class="modal-actions">
+        <button class="alt" id="cancelModal">Cancelar</button>
+        <button class="btn-buy" id="confirmPay">
+          <i class="fas fa-credit-card"></i>
+          Ir para Pagamento
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-back" id="previewBack" aria-hidden="true">
+    <div class="modal preview-modal" role="document">
+      <div class="modal-header">
+        <h4>Prévia Rápida</h4>
+        <button class="close-btn" id="closePreview" aria-label="Fechar">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div id="previewArea" class="preview-area"></div>
+      <div class="modal-actions">
+        <button class="alt" id="closePreviewBtn">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

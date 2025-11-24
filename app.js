@@ -1,0 +1,374 @@
+document.addEventListener("DOMContentLoaded", () => {
+  // --- CONFIGURAÇÕES GLOBAIS ---
+  const PAYMENT_LINK = "https://go.invictuspay.app.br/uiu36mqyaf";
+  const SLIDE_DURATION = 5000; // 5 segundos por slide
+  const TRANSITION_MS = 700;
+
+  // Lista manual de arquivos (imagens e vídeos) na pasta /assets
+  const mediaFiles = [
+    "1.mp4",
+    "2.mp4",
+    "3.mp4",
+    "4.mp4",
+  ];
+
+  // --- COMPONENTES DOM ---
+  const carouselRoot = document.getElementById('carouselRoot');
+  const slidesEl = document.getElementById('slides');
+  const indicatorsEl = document.getElementById('indicators');
+  const nextBtn = document.getElementById('next');
+  const prevBtn = document.getElementById('prev');
+  const currentSlideEl = document.getElementById('currentSlide');
+  const totalSlidesEl = document.getElementById('totalSlides');
+  const mediaTypeTag = document.getElementById('mediaTypeTag');
+  const loadingOverlay = document.getElementById('loadingOverlay');
+
+  const buyBtn = document.getElementById('buyBtn');
+  const modalBack = document.getElementById('modalBack');
+  const closeModal = document.getElementById('closeModal'); 
+  const confirmPay = document.getElementById('confirmPay');
+  const cancelModal = document.getElementById('cancelModal');
+  const previewBtn = document.getElementById('previewBtn');
+  const previewBack = document.getElementById('previewBack');
+  const closePreview = document.getElementById('closePreview');
+  const closePreviewBtn = document.getElementById('closePreviewBtn');
+  const previewArea = document.getElementById('previewArea');
+
+  // --- ESTADO DO CARROSSEL ---
+  let slides = [];
+  let dots = [];
+  let idx = 0;
+  let timer = null;
+  let playing = true;
+  let mediaLoaded = 0;
+
+  // --- FUNÇÕES DE UTILIDADE ---
+
+  /**
+   * Seleciona aleatoriamente um arquivo da lista de mídias.
+   * @returns {{file: string, isVideo: boolean, src: string}} Objeto com detalhes da mídia.
+   */
+  function getRandomMedia() {
+    const randomIndex = Math.floor(Math.random() * mediaFiles.length);
+    const file = mediaFiles[randomIndex];
+    const isVideo = file.endsWith('.mp4');
+    const src = file.startsWith('http') ? file : `assets/${file}`;
+    return { file, isVideo, src };
+  }
+
+  /**
+   * Atualiza o contador de slides e o tipo de mídia
+   */
+  function updateSlideInfo() {
+    if (currentSlideEl) currentSlideEl.textContent = idx + 1;
+    if (totalSlidesEl) totalSlidesEl.textContent = slides.length;
+    
+    // Atualiza o tipo de mídia
+    if (slides[idx]) {
+      const isVideo = slides[idx].dataset.type === 'video';
+      if (mediaTypeTag) mediaTypeTag.textContent = isVideo ? 'Vídeo' : 'Imagem';
+    }
+  }
+
+  /**
+   * Esconde a tela de carregamento quando todo o conteúdo estiver pronto
+   */
+  function hideLoadingScreen() {
+    setTimeout(() => {
+      if (loadingOverlay) {
+        loadingOverlay.classList.add('hidden');
+        setTimeout(() => {
+          loadingOverlay.style.display = 'none';
+        }, 500);
+      }
+    }, 1000);
+  }
+
+  // --- FUNÇÕES DO CARROSSEL ---
+
+  /**
+   * Constrói a estrutura do carrossel no DOM
+   */
+  function buildCarousel() {
+    slidesEl.innerHTML = '';
+    indicatorsEl.innerHTML = '';
+    mediaLoaded = 0;
+
+    mediaFiles.forEach((file, i) => {
+      const isVideo = file.endsWith('.mp4');
+      const slide = document.createElement('div');
+      slide.className = 'slide';
+      slide.dataset.index = i;
+      slide.dataset.type = isVideo ? 'video' : 'image';
+
+      const src = file.startsWith('http') ? file : `assets/${file}`;
+
+      if (isVideo) {
+        // Usa a tag <video> com autoplay/muted para prévia
+        slide.innerHTML = `<video muted playsinline preload="metadata" loop>
+          <source src="${src}" type="video/mp4">
+          Seu navegador não suporta vídeo.
+        </video>
+        <div class="caption">Vídeo ${i + 1}</div>`;
+        
+        // Adiciona evento de carregamento
+        const video = slide.querySelector('video');
+        video.addEventListener('loadeddata', handleMediaLoad);
+        video.addEventListener('error', handleMediaLoad); // Em caso de erro, conta como carregado
+      } else {
+        // Usa a tag <img>
+        slide.innerHTML = `<img src="${src}" alt="Slide ${i + 1}">
+        <div class="caption">Imagem ${i + 1}</div>`;
+        
+        // Adiciona evento de carregamento
+        const img = slide.querySelector('img');
+        img.addEventListener('load', handleMediaLoad);
+        img.addEventListener('error', handleMediaLoad); // Em caso de erro, conta como carregado
+      }
+
+      slidesEl.appendChild(slide);
+
+      // Constrói o indicador (dot)
+      const dot = document.createElement('button');
+      dot.className = 'dot' + (i === 0 ? ' active' : '');
+      dot.dataset.index = i;
+      dot.setAttribute('aria-label', `Ir para slide ${i + 1}`);
+      indicatorsEl.appendChild(dot);
+    });
+
+    // Atualiza as NodeLists
+    slides = Array.from(document.querySelectorAll('#slides .slide'));
+    dots = Array.from(document.querySelectorAll('#indicators .dot'));
+
+    // Define a variável CSS para o efeito Ken-Burns
+    slidesEl.style.setProperty('--slide-duration', (SLIDE_DURATION / 1000).toFixed(2) + 's');
+    
+    // Atualiza informações do slide
+    updateSlideInfo();
+  }
+
+  /**
+   * Manipula o carregamento de mídia
+   */
+  function handleMediaLoad() {
+    mediaLoaded++;
+    // Se todas as mídias estiverem carregadas, esconde a tela de loading
+    if (mediaLoaded >= mediaFiles.length) {
+      hideLoadingScreen();
+    }
+  }
+
+  /**
+   * Inicializa o comportamento dinâmico do carrossel (timers, eventos)
+   */
+  function initCarousel() {
+    if (slides.length === 0) return;
+
+    if (timer) clearInterval(timer);
+    idx = 0;
+    showSlide(idx);
+    timer = setInterval(() => { goTo(idx + 1); }, SLIDE_DURATION);
+
+    // Controles de Navegação
+    nextBtn.onclick = () => { goTo(idx + 1); resetTimer(); };
+    prevBtn.onclick = () => { goTo(idx - 1); resetTimer(); };
+    dots.forEach(d => d.onclick = () => { goTo(+d.dataset.index); resetTimer(); });
+
+    // Pausar/Retomar ao passar o mouse
+    carouselRoot.addEventListener('mouseenter', () => { pause(); });
+    carouselRoot.addEventListener('mouseleave', () => { resume(); });
+    
+    // Navegação por teclado
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') {
+        goTo(idx - 1);
+        resetTimer();
+      } else if (e.key === 'ArrowRight') {
+        goTo(idx + 1);
+        resetTimer();
+      }
+    });
+  }
+
+  /**
+   * Exibe um slide específico e controla a mídia.
+   * @param {number} i - Índice do slide.
+   */
+  function showSlide(i) {
+    const n = slides.length;
+    if (n === 0) return;
+    idx = ((i % n) + n) % n;
+
+    slidesEl.style.transition = `transform ${TRANSITION_MS}ms cubic-bezier(0.25, 0.46, 0.45, 0.94)`;
+    slidesEl.style.transform = `translateX(-${idx * 100}%)`;
+
+    slides.forEach((s, si) => {
+      s.classList.toggle('active', si === idx);
+      const v = s.querySelector('video');
+      if (v) {
+        // PAUSA e RESETA todos os vídeos inativos
+        try { v.pause(); v.currentTime = 0; } catch (e) { /* ignore */ }
+      }
+    });
+
+    const current = slides[idx];
+    if (!current) return;
+    const currentVideo = current.querySelector('video');
+    
+    if (currentVideo) {
+      currentVideo.muted = true;
+      currentVideo.onloadedmetadata = () => {
+          currentVideo.play().catch(() => { /* autoplay bloqueado, ignora */ });
+      };
+      currentVideo.load(); 
+    }
+    
+    dots.forEach(d => d.classList.remove('active'));
+    if (dots[idx]) dots[idx].classList.add('active');
+    
+    // Atualiza informações do slide
+    updateSlideInfo();
+  }
+
+  function goTo(i) {
+    showSlide(i);
+  }
+
+  function resetTimer() {
+    if (timer) clearInterval(timer);
+    if(playing) {
+      timer = setInterval(() => { goTo(idx + 1); }, SLIDE_DURATION);
+    }
+  }
+
+  function pause() { 
+    playing = false; 
+    if (timer) clearInterval(timer); 
+    const currentVideo = document.querySelector('.slide.active video');
+    if (currentVideo) {
+        try { currentVideo.pause(); } catch (e) { /* ignore */ }
+    }
+  }
+  
+  function resume() { 
+    if (!playing) playing = true;
+    resetTimer(); 
+    const currentVideo = document.querySelector('.slide.active video');
+    if (currentVideo) {
+        try { currentVideo.play().catch(() => { /* autoplay bloqueado, ignora */ }); } catch (e) { /* ignore */ }
+    }
+  }
+
+  // --- LÓGICA DE BOTÕES E MODAIS ---
+  
+  // Confirmação de compra (Modal)
+  if (buyBtn) buyBtn.addEventListener('click', () => {
+    modalBack.style.display = 'flex';
+    modalBack.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden'; // Previne scroll no body
+  });
+
+  const closeModalFunc = () => {
+    modalBack.style.display = 'none';
+    modalBack.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = ''; // Restaura scroll
+  };
+
+  if (closeModal) closeModal.addEventListener('click', closeModalFunc);
+  if (cancelModal) cancelModal.addEventListener('click', closeModalFunc);
+
+  if (confirmPay) confirmPay.addEventListener('click', () => {
+    modalBack.style.display = 'none';
+    modalBack.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = ''; // Restaura scroll
+    window.open(PAYMENT_LINK, '_blank'); // Abre em nova aba
+  });
+
+  if (modalBack) modalBack.addEventListener('click', (e) => { 
+    if (e.target === modalBack) { 
+      closeModalFunc();
+    } 
+  });
+
+  // Preview Rápida (Modal) - Lógica Alterada para RANDOMIZAÇÃO
+  if (previewBtn) previewBtn.addEventListener('click', () => {
+    
+    // 1. Pega uma mídia aleatória, NÃO a ativa do carrossel.
+    const media = getRandomMedia();
+    
+    // Limpa a área de preview
+    previewArea.innerHTML = '';
+
+    if (media.isVideo) {
+      // Cria um elemento de vídeo para o modal (com controles e som)
+      const vid = document.createElement('video');
+      vid.controls = true;
+      vid.autoplay = true;
+      vid.muted = false; // Permite áudio no modal
+      vid.style.width = '100%';
+      vid.style.height = '100%';
+      vid.style.objectFit = 'contain';
+      
+      const s = document.createElement('source');
+      s.src = media.src; // Usa o src aleatório
+      s.type = 'video/mp4';
+      vid.appendChild(s);
+      
+      previewArea.appendChild(vid);
+      
+      // Tenta reproduzir e lidar com o erro de autoplay bloqueado
+      vid.play().catch(() => { /* ignore */ });
+
+    } else {
+      // Cria um elemento de imagem
+      const img = document.createElement('img');
+      img.src = media.src; // Usa o src aleatório
+      img.style.width = '100%';
+      img.style.height = '100%';
+      img.style.objectFit = 'contain';
+      img.alt = 'Prévia do conteúdo';
+      previewArea.appendChild(img);
+    }
+
+    previewBack.style.display = 'flex';
+    previewBack.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden'; // Previne scroll no body
+  });
+
+  const closePreviewFunc = () => { 
+    // Garante que o vídeo pare ao fechar o modal
+    const videoInPreview = previewArea.querySelector('video');
+    if (videoInPreview) {
+      try { videoInPreview.pause(); videoInPreview.currentTime = 0; } catch (e) { /* ignore */ }
+    }
+
+    previewBack.style.display = 'none'; 
+    previewBack.setAttribute('aria-hidden', 'true'); 
+    previewArea.innerHTML = ''; 
+    document.body.style.overflow = ''; // Restaura scroll
+  };
+
+  if (closePreview) closePreview.addEventListener('click', closePreviewFunc);
+  if (closePreviewBtn) closePreviewBtn.addEventListener('click', closePreviewFunc);
+  
+  if (previewBack) previewBack.addEventListener('click', (e) => { 
+    if (e.target === previewBack) { 
+      closePreviewFunc();
+    } 
+  });
+
+  // Fecha modais com a tecla ESC
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      if (modalBack.style.display === 'flex') closeModalFunc();
+      if (previewBack.style.display === 'flex') closePreviewFunc();
+    }
+  });
+
+  // --- INICIALIZAÇÃO ---
+  buildCarousel();
+  initCarousel();
+  
+  // Fallback para esconder a tela de loading caso algumas mídias não carreguem
+  setTimeout(hideLoadingScreen, 5000);
+});
