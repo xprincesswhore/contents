@@ -104,6 +104,9 @@
             </div>
           </div>
 
+          <!-- Espaço entre as seções -->
+          <div style="height: 30px;"></div>
+
           <div class="purchase" aria-labelledby="purchase-title">
             <div class="pricing">
               <h3 id="purchase-title">Finalize a compra</h3>
@@ -150,14 +153,16 @@
     </div>
   </footer>
 
+  <!-- Modal de Confirmação de Compra (Agora com formulário) -->
   <div class="modal-back" id="modalBack" role="dialog" aria-modal="true" aria-hidden="true">
-    <div class="modal" role="document">
+    <div class="modal checkout-modal" role="document">
       <div class="modal-header">
-        <h4>Confirmar Compra</h4>
+        <h4>Finalizar Compra</h4>
         <button class="close-btn" id="closeModal" aria-label="Fechar">
           <i class="fas fa-times"></i>
         </button>
       </div>
+      
       <div class="modal-body">
         <div class="purchase-summary">
           <i class="fas fa-shopping-bag"></i>
@@ -166,18 +171,120 @@
             <span>R$ 20,00</span>
           </div>
         </div>
-        <p>Deseja prosseguir para a página de pagamento?</p>
-      </div>
-      <div class="modal-actions">
-        <button class="alt" id="cancelModal">Cancelar</button>
-        <button class="btn-buy" id="confirmPay">
-          <i class="fas fa-credit-card"></i>
-          Ir para Pagamento
-        </button>
+        
+        <form id="pixCheckoutForm" class="checkout-form">
+          <div class="form-section">
+            <h5>Dados Pessoais</h5>
+            <div class="form-grid">
+              <div class="form-group full-width">
+                <label for="customerName">Nome Completo *</label>
+                <input type="text" id="customerName" name="name" required value="João da Silva">
+              </div>
+              <div class="form-group">
+                <label for="customerEmail">E-mail *</label>
+                <input type="email" id="customerEmail" name="email" required value="teste@exemplo.com">
+              </div>
+              <div class="form-group">
+                <label for="customerDocument">CPF/CNPJ *</label>
+                <input type="text" id="customerDocument" name="document" required value="09115751031">
+              </div>
+              <div class="form-group full-width">
+                <label for="customerPhone">Telefone (Whatsapp) *</label>
+                <input type="text" id="customerPhone" name="phone_number" required value="21999999999">
+              </div>
+            </div>
+          </div>
+
+          <div class="form-section">
+            <h5>Endereço</h5>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="customerZipCode">CEP *</label>
+                <input type="text" id="customerZipCode" name="zip_code" required value="23822180">
+              </div>
+              <div class="form-group">
+                <label for="customerState">Estado (UF) *</label>
+                <input type="text" id="customerState" name="state" required value="RJ" maxlength="2">
+              </div>
+              <div class="form-group full-width">
+                <label for="customerStreet">Rua *</label>
+                <input type="text" id="customerStreet" name="street_name" required value="Rua Teste">
+              </div>
+              <div class="form-group">
+                <label for="customerNumber">Número *</label>
+                <input type="text" id="customerNumber" name="number" required value="sn">
+              </div>
+              <div class="form-group">
+                <label for="customerComplement">Complemento</label>
+                <input type="text" id="customerComplement" name="complement" value="Apt 101">
+              </div>
+              <div class="form-group">
+                <label for="customerNeighborhood">Bairro *</label>
+                <input type="text" id="customerNeighborhood" name="neighborhood" required value="Centro">
+              </div>
+              <div class="form-group">
+                <label for="customerCity">Cidade *</label>
+                <input type="text" id="customerCity" name="city" required value="Itaguaí">
+              </div>
+            </div>
+          </div>
+          
+          <input type="hidden" id="offerHashInput" name="offer_hash" value="png8aj6v6p">
+          
+          <div class="modal-actions">
+            <button type="button" class="alt" id="cancelModal">Cancelar</button>
+            <button type="submit" class="btn-buy" id="confirmPay">
+              <div id="loadingSpinnerPix" class="spinner"></div>
+              <span>GERAR PIX</span>
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   </div>
 
+  <!-- Modal PIX Gerado -->
+  <div class="modal-back" id="pixModal" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal" role="document">
+      <div class="modal-header">
+        <h4>
+          <i class="fas fa-check-circle" style="color: #16a34a; margin-right: 8px;"></i>
+          PIX Gerado!
+        </h4>
+        <button class="close-btn" id="closePixModal" aria-label="Fechar">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      
+      <div class="modal-body">
+        <div class="pix-content">
+          <div id="qrCodeContainer" class="qr-code-container">
+            <p>Escaneie no App do Banco:</p>
+            <img id="qrCodeImage" alt="QR Code PIX" class="qr-code-image">
+          </div>
+
+          <div class="amount-display">
+            <span>Valor Total:</span>
+            <span id="modalAmount" class="amount-value">R$ 20,00</span>
+          </div>
+
+          <div class="pix-code-section">
+            <label for="pixCodeTextarea">Pix Copia e Cola:</label>
+            <textarea id="pixCodeTextarea" readonly rows="3" class="pix-code-textarea"></textarea>
+          </div>
+
+          <button id="copyPixButton" class="btn-buy full-width">
+            <i class="fas fa-copy"></i>
+            <span id="copyButtonText">COPIAR CÓDIGO</span>
+          </button>
+
+          <p id="modalHash" class="transaction-hash">ID Transação: </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Preview -->
   <div class="modal-back" id="previewBack" aria-hidden="true">
     <div class="modal preview-modal" role="document">
       <div class="modal-header">
