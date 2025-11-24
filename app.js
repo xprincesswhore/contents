@@ -24,7 +24,6 @@ document.addEventListener("DOMContentLoaded", async () => {
   const totalSlidesEl = document.getElementById('totalSlides');
   const mediaTypeTag = document.getElementById('mediaTypeTag');
   // Referência ao elemento de loading
-  const loadingOverlay = document.getElementById('loadingOverlay'); 
 
   // Modais
   const buyBtn = document.getElementById('buyBtn');
@@ -90,15 +89,6 @@ document.addEventListener("DOMContentLoaded", async () => {
    * Remove o elemento de loading do DOM após o tempo definido (2000ms).
    * Função refatorada para a lógica solicitada.
    */
-  function removeLoadingScreen() {
-    if (loadingOverlay && loadingOverlay.parentNode) {
-      setTimeout(() => {
-        // Ação explícita de remoção do DOM.
-        loadingOverlay.parentNode.removeChild(loadingOverlay);
-        console.log('Loading Overlay removido do DOM após 2s.');
-      }, SPLASH_TIME_MS);
-    }
-  }
 
   // --- API CEP ---
   async function buscarEnderecoPorCEP(cep) {
